@@ -1,0 +1,16 @@
+allure_python_commons
+clickhouse_sqlalchemy
+Flask
+jsonpath
+pandas
+paramiko
+pymongo
+PyMySQL
+PyQt5
+pytest
+PyYAML
+redis
+requests
+SQLAlchemy
+urllib3
+faker

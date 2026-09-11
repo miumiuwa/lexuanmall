@@ -1,0 +1,202 @@
+from collections.abc import (
+    Callable,
+    Generator,
+    Iterable,
+    Mapping,
+    Sequence,
+)
+import sqlite3
+from typing import (
+    Any,
+    Literal,
+    TypeAlias,
+    overload,
+)
+
+from pandas.core.frame import DataFrame
+from sqlalchemy.engine import Connectable
+from sqlalchemy.orm import FromStatement
+from sqlalchemy.sql import Select
+from sqlalchemy.sql.expression import (
+    Selectable,
+    TextClause,
+    UpdateBase,
+)
+
+from pandas._libs.lib import NoDefault
+from pandas._typing import (
+    DtypeArg,
+    DtypeBackend,
+    Scalar,
+    SequenceNotStr,
+    np_ndarray,
+)
+
+_SQLConnection: TypeAlias = str | Connectable | sqlite3.Connection
+
+_SQLStatement: TypeAlias = (
+    str | Selectable | TextClause | Select[Any] | FromStatement[Any] | UpdateBase
+)
+
+@overload
+def read_sql_table(
+    table_name: str,
+    con: _SQLConnection,
+    schema: str | None = None,
+    index_col: str | list[str] | None = None,
+    coerce_float: bool = True,
+    parse_dates: list[str] | dict[str, str] | dict[str, dict[str, Any]] | None = None,
+    columns: list[str] | None = None,
+    *,
+    chunksize: int,
+    dtype_backend: DtypeBackend | NoDefault = ...,
+) -> Generator[DataFrame]: ...
+@overload
+def read_sql_table(
+    table_name: str,
+    con: _SQLConnection,
+    schema: str | None = None,
+    index_col: str | list[str] | None = None,
+    coerce_float: bool = True,
+    parse_dates: list[str] | dict[str, str] | dict[str, dict[str, Any]] | None = None,
+    columns: list[str] | None = None,
+    chunksize: None = None,
+    dtype_backend: DtypeBackend | NoDefault = ...,
+) -> DataFrame: ...
+@overload
+def read_sql_query(
+    sql: _SQLStatement,
+    con: _SQLConnection,
+    index_col: str | list[str] | None = None,
+    coerce_float: bool = True,
+    params: (
+        list[Scalar]
+        | tuple[Scalar, ...]
+        | tuple[tuple[Scalar, ...], ...]
+        | Mapping[str, Scalar]
+        | Mapping[str, tuple[Scalar, ...]]
+        | None
+    ) = None,
+    parse_dates: list[str] | dict[str, str] | dict[str, dict[str, Any]] | None = None,
+    *,
+    chunksize: int,
+    dtype: DtypeArg | None = None,
+    dtype_backend: DtypeBackend | NoDefault = ...,
+) -> Generator[DataFrame]: ...
+@overload
+def read_sql_query(
+    sql: _SQLStatement,
+    con: _SQLConnection,
+    index_col: str | list[str] | None = None,
+    coerce_float: bool = True,
+    params: (
+        list[Scalar]
+        | tuple[Scalar, ...]
+        | tuple[tuple[Scalar, ...], ...]
+        | Mapping[str, Scalar]
+        | Mapping[str, tuple[Scalar, ...]]
+        | None
+    ) = None,
+    parse_dates: list[str] | dict[str, str] | dict[str, dict[str, Any]] | None = None,
+    chunksize: None = None,
+    dtype: DtypeArg | None = None,
+    dtype_backend: DtypeBackend | NoDefault = ...,
+) -> DataFrame: ...
+@overload
+def read_sql(
+    sql: _SQLStatement,
+    con: _SQLConnection,
+    index_col: str | list[str] | None = None,
+    coerce_float: bool = True,
+    params: (
+        Sequence[Scalar]
+        | tuple[tuple[Scalar, ...], ...]
+        | Mapping[str, Scalar]
+        | Mapping[str, tuple[Scalar, ...]]
+        | None
+    ) = None,
+    parse_dates: list[str] | dict[str, str] | dict[str, dict[str, Any]] | None = None,
+    columns: list[str] | None = None,
+    *,
+    chunksize: int,
+    dtype: DtypeArg | None = None,
+    dtype_backend: DtypeBackend | NoDefault = ...,
+) -> Generator[DataFrame]: ...
+@overload
+def read_sql(
+    sql: _SQLStatement,
+    con: _SQLConnection,
+    index_col: str | list[str] | None = None,
+    coerce_float: bool = True,
+    params: (
+        Sequence[Scalar]
+        | tuple[tuple[Scalar, ...], ...]
+        | Mapping[str, Scalar]
+        | Mapping[str, tuple[Scalar, ...]]
+        | None
+    ) = None,
+    parse_dates: list[str] | dict[str, str] | dict[str, dict[str, Any]] | None = None,
+    columns: list[str] | None = None,
+    chunksize: None = None,
+    dtype: DtypeArg | None = None,
+    dtype_backend: DtypeBackend | NoDefault = ...,
+) -> DataFrame: ...
+
+class PandasSQL:
+    def to_sql(
+        self,
+        frame: DataFrame,
+        name: str,
+        if_exists: Literal["fail", "replace", "append", "delete_rows"] = "fail",
+        index: bool = True,
+        index_label: str | SequenceNotStr[str] | None = None,
+        schema: str | None = None,
+        chunksize: int | None = None,
+        dtype: DtypeArg | None = None,
+        method: (
+            Literal["multi"]
+            | Callable[[SQLTable, Any, list[str], Iterable[Any]], int | None]
+            | None
+        ) = None,
+        engine: str = "auto",
+        **engine_kwargs: Any,
+    ) -> int | None: ...
+
+class SQLTable:
+    name: str
+    pd_sql: PandasSQL  # pandas SQL interface
+    prefix: str
+    frame: DataFrame | None
+    index: list[str]
+    schema: str
+    if_exists: Literal["fail", "replace", "append", "delete_rows"]
+    keys: list[str]
+    dtype: DtypeArg | None
+    table: Any  # sqlalchemy.Table
+    def __init__(
+        self,
+        name: str,
+        pandas_sql_engine: PandasSQL,
+        frame: DataFrame | None = None,
+        index: bool | str | list[str] | None = True,
+        if_exists: Literal["fail", "replace", "append", "delete_rows"] = "fail",
+        prefix: str = "pandas",
+        index_label: str | list[str] | None = None,
+        schema: str | None = None,
+        keys: str | list[str] | None = None,
+        dtype: DtypeArg | None = None,
+    ) -> None: ...
+    def exists(self) -> bool: ...
+    def sql_schema(self) -> str: ...
+    def create(self) -> None: ...
+    def insert_data(self) -> tuple[list[str], list[np_ndarray]]: ...
+    def insert(
+        self, chunksize: int | None = None, method: str | None = None
+    ) -> int | None: ...
+    def read(
+        self,
+        coerce_float: bool = True,
+        parse_dates: bool | list[str] | None = None,
+        columns: list[str] | None = None,
+        chunksize: int | None = None,
+    ) -> DataFrame | Generator[DataFrame]: ...

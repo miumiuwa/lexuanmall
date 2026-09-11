@@ -1,0 +1,8 @@
+INFO - 2026-09-11 19:13:44,809 - sendrequest.py:135 -[sendrequest:run_main] - 接口名称：用户登录
+INFO - 2026-09-11 19:13:44,810 - sendrequest.py:136 -[sendrequest:run_main] - 请求地址：http://127.0.0.1:8787/dar/user/login
+INFO - 2026-09-11 19:13:44,810 - sendrequest.py:137 -[sendrequest:run_main] - 请求方式：post
+INFO - 2026-09-11 19:13:44,811 - sendrequest.py:138 -[sendrequest:run_main] - 测试用例名称：用户名和密码正确登录验证
+INFO - 2026-09-11 19:13:44,811 - sendrequest.py:139 -[sendrequest:run_main] - 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+INFO - 2026-09-11 19:13:44,811 - sendrequest.py:140 -[sendrequest:run_main] - Cookie：None
+INFO - 2026-09-11 19:13:44,814 - sendrequest.py:144 -[sendrequest:run_main] - 请求参数：{'data': {'user_name': 'test01', 'passwd': 'admin123'}}
+ERROR - 2026-09-11 19:13:46,857 - sendrequest.py:110 -[sendrequest:send_request] - ConnectionError--连接异常

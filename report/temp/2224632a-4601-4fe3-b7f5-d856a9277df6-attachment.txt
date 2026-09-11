@@ -1,0 +1,8 @@
+INFO     common.recordlog:sendrequest.py:135 接口名称：用户登录
+INFO     common.recordlog:sendrequest.py:136 请求地址：http://127.0.0.1:8787/dar/user/login
+INFO     common.recordlog:sendrequest.py:137 请求方式：post
+INFO     common.recordlog:sendrequest.py:138 测试用例名称：用户名和密码正确登录验证
+INFO     common.recordlog:sendrequest.py:139 请求头：{'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+INFO     common.recordlog:sendrequest.py:140 Cookie：None
+INFO     common.recordlog:sendrequest.py:144 请求参数：{'data': {'user_name': 'test01', 'passwd': 'admin123'}}
+ERROR    common.recordlog:sendrequest.py:110 ConnectionError--连接异常
